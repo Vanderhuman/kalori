@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Fitness Tracker Pro - AI Powered</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-theme="light">
+  <div class="container">
+    <div class="header">
+      <div class="header-controls">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
+        <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+      </div>
+      <h1>🏋️ Smart Fitness</h1>
+      <div class="subtitle">AI-Powered Personal Trainer with Advanced Analytics</div>
+      <div class="user-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalWorkouts">0</div>
+          <div class="stat-label">Workouts</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalCalories">0</div>
+          <div class="stat-label">Calories</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="currentStreak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="userLevel">1</div>
+          <div class="stat-label">Level</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('kalori-tab', this)">Workout</div>
+        <div class="tab" onclick="switchTab('progress-tab', this)">Progress</div>
+        <div class="tab" onclick="switchTab('nutrition-tab', this)">Nutrition</div>
+        <div class="tab" onclick="switchTab('goals-tab', this)">Goals</div>
+        <div class="tab" onclick="switchTab('rencana-tab', this)">Plans</div>
+        <div class="tab" onclick="switchTab('social-tab', this)">Social</div>
+        <div class="tab" onclick="switchTab('timer-tab', this)">Timer</div>
+      </div>
+
+      <!-- Tab Workout (Original Cek Kalori) -->
+      <div id="kalori-tab" class="tab-content active">
+        <form id="kaloriForm">
+          <label for="berat">Berat Badan (kg):</label>
+          <input type="number" id="berat" name="berat" min="1" step="0.1" required>
+
+          <label for="durasi">Durasi Olahraga (menit):</label>
+          <input type="number" id="durasi" name="durasi" min="1" step="1" required>
+
+          <label for="olahraga">Jenis Olahraga:</label>
+          <select id="olahraga" name="olahraga" required>
+            <option value="lari">🏃‍♂️ Lari</option>
+            <option value="bersepeda">🚴‍♂️ Bersepeda</option>
+            <option value="renang">🏊‍♂️ Renang</option>
+            <option value="jalan">🚶‍♂️ Jalan Kaki</option>
+            <option value="yoga">🧘‍♀️ Yoga</option>
+            <option value="gym">🏋️‍♂️ Gym/Weight Training</option>
+            <option value="hiit">⚡ HIIT</option>
+          </select>
+
+          <label for="intensitas">Intensitas:</label>
+          <select id="intensitas" name="intensitas" required>
+            <option value="ringan">😌 Ringan</option>
+            <option value="sedang">💪 Sedang</option>
+            <option value="berat">🔥 Berat</option>
+          </select>
+
+          <div class="plan-form-grid">
+            <div>
+              <label for="heartRate">Heart Rate (BPM):</label>
+              <input type="number" id="heartRate" name="heartRate" min="60" max="220">
+            </div>
+            <div>
+              <label for="mood">Mood Pre-Workout:</label>
+              <select id="mood" name="mood">
+                <option value="energetic">😄 Energetic</option>
+                <option value="tired">😴 Tired</option>
+                <option value="motivated">💪 Motivated</option>
+                <option value="stressed">😰 Stressed</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn">🤖 Analyze with AI</button>
+        </form>
+
+        <div id="loading" class="loading" style="display:none;">
+          AI analyzing your workout...
+        </div>
+
+        <div id="result" class="result-card" style="display:none;">
+          <div id="calories" class="calories-display"></div>
+          <div id="category" class="category-badge"></div>
+
+          <div class="advice-section">
+            <h4>🎯 AI Personal Coach Analysis</h4>
+            <p id="advice"></p>
+          </div>
+
+          <div class="tips-grid" id="tips-container">
+            <!-- Tips akan diisi oleh JavaScript -->
+          </div>
+
+          <div class="motivation-box">
+            <p id="motivation"></p>
+          </div>
+
+          <div class="exercise-demo" id="exerciseDemo" style="display:none;">
+            <div class="demo-animation" id="demoAnimation">🏃‍♂️</div>
+            <h4>Exercise Form Tips</h4>
+            <p id="formTips"></p>
+          </div>
+
+          <button class="btn-secondary btn-small" onclick="saveWorkout()">💾 Save Workout</button>
+          <button class="btn-secondary btn-small" onclick="shareWorkout()">📤 Share</button>
+        </div>
+
+        <div id="error" class="error-message" style="display:none;"></div>
+      </div>
+
+      <!-- Tab Progress -->
+      <div id="progress-tab" class="tab-content">
+        <div class="progress-section">
+          <h3>📊 Your Fitness Journey</h3>
+
+          <div class="streak-counter">
+            <div class="streak-number" id="streakDisplay">0</div>
+            <div class="streak-fire">🔥</div>
+            <div>Day Streak!</div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number" id="weeklyCalories">0</div>
+              <div class="stat-text">This Week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="monthlyCalories">0</div>
+              <div class="stat-text">This Month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="avgDuration">0</div>
+              <div class="stat-text">Avg Duration</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="favoriteExercise">-</div>
+              <div class="stat-text">Favorite</div>
+            </div>
+          </div>
+
+          <div class="progress-chart">
+            <h4>Weekly Progress</h4>
+            <canvas id="progressChart" width="400" height="200"></canvas>
+          </div>
+
+          <div class="progress-chart">
+            <h4>🏆 Achievements</h4>
+            <div id="achievementsList">
+              <!-- Achievements will be populated here -->
+            </div>
+          </div>
+
+          <div class="progress-chart">
+            <h4>📈 Workout History</h4>
+            <div id="workoutHistory">
+              <!-- History will be populated here -->
+            </div>
+          </div>
+
+          <button onclick="exportData()">📊 Export Data</button>
+        </div>
+      </div>
+
+      <!-- Tab Nutrition -->
+      <div id="nutrition-tab" class="tab-content">
+        <div class="nutrition-section">
+          <h3>🍎 Nutrition Tracker</h3>
+
+          <form id="nutritionForm">
+            <div class="plan-form-grid">
+              <div>
+                <label for="caloriesIntake">Calories Intake:</label>
+                <input type="number" id="caloriesIntake" name="caloriesIntake" min="0">
+              </div>
+              <div>
+                <label for="waterIntake">Water (glasses):</label>
+                <input type="number" id="waterIntake" name="waterIntake" min="0" max="20">
+              </div>
+            </div>
+
+            <div class="plan-form-grid">
+              <div>
+                <label for="protein">Protein (g):</label>
+                <input type="number" id="protein" name="protein" min="0">
+              </div>
+              <div>
+                <label for="carbs">Carbs (g):</label>
+                <input type="number" id="carbs" name="carbs" min="0">
+              </div>
+            </div>
+
+            <div class="plan-form-grid">
+              <div>
+                <label for="fat">Fat (g):</label>
+                <input type="number" id="fat" name="fat" min="0">
+              </div>
+              <div>
+                <label for="fiber">Fiber (g):</label>
+                <input type="number" id="fiber" name="fiber" min="0">
+              </div>
+            </div>
+
+            <button type="submit">📝 Log Nutrition</button>
+          </form>
+
+          <div class="nutrition-card">
+            <h4>📊 Daily Balance</h4>
+            <div id="calorieBalance">
+              <p>Intake: <span id="totalIntake">0</span> kcal</p>
+              <p>Burned: <span id="totalBurned">0</span> kcal</p>
+              <p>Net: <span id="netCalories">0</span> kcal</p>
+            </div>
+
+            <div class="macro-bar">
+              <div class="macro-protein" id="proteinBar" style="width: 33%"></div>
+              <div class="macro-carbs" id="carbsBar" style="width: 34%"></div>
+              <div class="macro-fat" id="fatBar" style="width: 33%"></div>
+            </div>
+          </div>
+
+          <div class="nutrition-card">
+            <h4>💧 Hydration Tracker</h4>
+            <div id="waterProgress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="waterProgressFill" style="width: 0%"></div>
+              </div>
+              <p><span id="currentWater">0</span>/8 glasses</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Goals -->
+      <div id="goals-tab" class="tab-content">
+        <div class="goals-section">
+          <h3>🎯 Personal Goals</h3>
+
+          <form id="goalForm">
+            <label for="goalType">Goal Type:</label>
+            <select id="goalType" name="goalType" required>
+              <option value="weight_loss">🏃‍♂️ Weight Loss</option>
+              <option value="muscle_gain">💪 Muscle Gain</option>
+              <option value="endurance">⚡ Endurance</option>
+              <option value="strength">🏋️‍♂️ Strength</option>
+              <option value="flexibility">🧘‍♀️ Flexibility</option>
+            </select>
+
+            <div class="plan-form-grid">
+              <div>
+                <label for="targetValue">Target Value:</label>
+                <input type="number" id="targetValue" name="targetValue" step="0.1" required>
+              </div>
+              <div>
+                <label for="targetDate">Target Date:</label>
+                <input type="date" id="targetDate" name="targetDate" required>
+              </div>
+            </div>
+
+            <label for="goalDescription">Description:</label>
+            <textarea id="goalDescription" name="goalDescription" rows="3"
+              placeholder="Describe your goal..."></textarea>
+
+            <button type="submit">🎯 Set Goal</button>
+          </form>
+
+          <div id="activeGoals">
+            <!-- Active goals will be populated here -->
+          </div>
+
+          <div class="progress-chart">
+            <h4>🏆 Goal Progress</h4>
+            <div id="goalProgress">
+              <!-- Goal progress charts will be here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Plans -->
+      <div id="rencana-tab" class="tab-content">
+        <div class="rencana-section">
+          <h3>📋 Weekly Workout Plans</h3>
+
+          <form id="rencanaForm">
+            <div class="plan-form-grid">
+              <div>
+                <label for="beratRencana">Berat Badan (kg):</label>
+                <input type="number" id="beratRencana" name="beratRencana" min="1" step="0.1" required>
+              </div>
+              <div>
+                <label for="waktuTersedia">Waktu/Hari (menit):</label>
+                <input type="number" id="waktuTersedia" name="waktuTersedia" min="10" max="180" required>
+              </div>
+            </div>
+
+            <div class="plan-form-grid">
+              <div>
+                <label for="tujuan">Tujuan:</label>
+                <select id="tujuan" name="tujuan" required>
+                  <option value="weight_loss">🔥 Weight Loss</option>
+                  <option value="muscle_gain">💪 Muscle Gain</option>
+                  <option value="endurance">⚡ Endurance</option>
+                  <option value="general_health">🌟 General Health</option>
+                </select>
+              </div>
+              <div>
+                <label for="level">Level:</label>
+                <select id="level" name="level" required>
+                  <option value="beginner">🌱 Beginner</option>
+                  <option value="intermediate">🌿 Intermediate</option>
+                  <option value="advanced">🌳 Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" id="rencanaBtn">🤖 Generate AI Plan</button>
+          </form>
+
+          <div id="loadingRencana" class="loading" style="display:none;">
+            AI creating your personalized plan...
+          </div>
+
+          <div id="weeklyPlan" class="weekly-plan" style="display:none;">
+            <!-- Weekly plan will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Social -->
+      <div id="social-tab" class="tab-content">
+        <div class="social-section">
+          <h3>👥 Community & Social</h3>
+
+          <div class="progress-chart">
+            <h4>🏆 Leaderboard</h4>
+            <div id="leaderboard">
+              <div class="leaderboard-item">
+                <div class="rank-badge">1</div>
+                <div>
+                  <strong>You</strong><br>
+                  <small><span id="yourScore">0</span> points this week</small>
+                </div>
+              </div>
+              <div class="leaderboard-item">
+                <div class="rank-badge">2</div>
+                <div>
+                  <strong>Sarah M.</strong><br>
+                  <small>1,250 points this week</small>
+                </div>
+              </div>
+              <div class="leaderboard-item">
+                <div class="rank-badge">3</div>
+                <div>
+                  <strong>Mike R.</strong><br>
+                  <small>1,180 points this week</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-chart">
+            <h4>🎯 Weekly Challenges</h4>
+            <div id="challenges">
+              <div class="goal-item">
+                <h5>🔥 Burn 2000 Calories</h5>
+                <div class="goal-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="challenge1Progress" style="width: 0%"></div>
+                  </div>
+                  <p><span id="challenge1Current">0</span>/2000 calories</p>
+                </div>
+              </div>
+              <div class="goal-item">
+                <h5>📅 5 Day Streak</h5>
+                <div class="goal-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="challenge2Progress" style="width: 0%"></div>
+                  </div>
+                  <p><span id="challenge2Current">0</span>/5 days</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-chart">
+            <h4>📤 Share Achievement</h4>
+            <button onclick="shareToSocial('facebook')">📘 Facebook</button>
+            <button onclick="shareToSocial('twitter')">🐦 Twitter</button>
+            <button onclick="shareToSocial('instagram')">📷 Instagram</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Timer -->
+      <div id="timer-tab" class="tab-content">
+        <div class="timer-section">
+          <h3>⏰ Workout Timer</h3>
+
+          <div class="timer-display" id="timerDisplay">00:00</div>
+
+          <div class="timer-controls">
+            <button class="timer-btn timer-start" onclick="startTimer()">▶️</button>
+            <button class="timer-btn timer-pause" onclick="pauseTimer()">⏸️</button>
+            <button class="timer-btn timer-stop" onclick="stopTimer()">⏹️</button>
+          </div>
+
+          <div class="plan-form-grid">
+            <div>
+              <label for="timerMinutes">Minutes:</label>
+              <input type="number" id="timerMinutes" min="0" max="60" value="25">
+            </div>
+            <div>
+              <label for="timerSeconds">Seconds:</label>
+              <input type="number" id="timerSeconds" min="0" max="59" value="0">
+            </div>
+          </div>
+
+          <div class="progress-chart">
+            <h4>⚡ HIIT Timer</h4>
+            <div class="plan-form-grid">
+              <div>
+                <label for="workTime">Work Time (sec):</label>
+                <input type="number" id="workTime" min="10" max="300" value="30">
+              </div>
+              <div>
+                <label for="restTime">Rest Time (sec):</label>
+                <input type="number" id="restTime" min="5" max="120" value="10">
+              </div>
+            </div>
+            <div class="plan-form-grid">
+              <div>
+                <label for="rounds">Rounds:</label>
+                <input type="number" id="rounds" min="1" max="20" value="8">
+              </div>
+              <div>
+                <button onclick="startHIIT()">🔥 Start HIIT</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="hiitStatus" class="progress-chart" style="display:none;">
+            <h4 id="hiitPhase">WORK</h4>
+            <div class="timer-display" id="hiitTimer">00:30</div>
+            <p>Round <span id="currentRound">1</span> of <span id="totalRounds">8</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-overlay" id="settingsOverlay" onclick="toggleSettings()"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="modal-header">
+      <h3>⚙️ Settings</h3>
+      <button class="modal-close" onclick="toggleSettings()">×</button>
+    </div>
+
+    <div>
+      <h4>🎨 Appearance</h4>
+      <label>
+        <input type="checkbox" id="darkModeToggle" onchange="toggleTheme()"> Dark Mode
+      </label>
+
+      <h4>🔔 Notifications</h4>
+      <label>
+        <input type="checkbox" id="workoutReminders" checked> Workout Reminders
+      </label>
+      <label>
+        <input type="checkbox" id="hydrationReminders" checked> Hydration Reminders
+      </label>
+
+      <h4>📊 Data</h4>
+      <button onclick="exportData()">📤 Export Data</button>
+      <button onclick="clearData()">🗑️ Clear All Data</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Voice Control Indicator -->
+  <div class="voice-indicator" id="voiceIndicator">🎤</div>
+</body>
+<script src="script.js"></script>
+
+</html>
